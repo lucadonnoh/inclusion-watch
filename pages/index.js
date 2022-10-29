@@ -9,6 +9,9 @@ export default function Home() {
     const [inclusionRate, setInclusionRate] = useState([]);
     const [waitingPeriod, setWaitingPeriod] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [refreshToken, setRefreshToken] = useState(0);
+    const [lastRefresh, setLastRefresh] = useState(new Date().toLocaleString());
+
 
     const calculateOfacCompliantRate = (data) => {
         var censoredBlocks = 0;
@@ -25,7 +28,6 @@ export default function Home() {
         // 1 day period in seconds
         const end_time = new Date().getTime() / 1000;
         const start_time = end_time - 24 * 60 * 60;
-        // allow cors
         fetch('/api/mevwatch', {
             method: 'POST',
             headers: {
@@ -38,8 +40,15 @@ export default function Home() {
                 setData(data);
                 setIsLoading(false);
             }
+            )
+            .finally(() => {
+                setTimeout(() => {
+                    setLastRefresh(new Date().toLocaleString());
+                    setRefreshToken(Math.random());
+                }, 30 * 1000);
+            }
             );
-    }, []);
+    }, [refreshToken]);
 
     useEffect(() => {
         if (data) {
@@ -71,7 +80,7 @@ export default function Home() {
 
     return (
         <div className={styles.container} style={{marginTop: '2em'}}>
-            {isLoading ? (
+            {!data ? (
                 <div>Loading...</div>
             ) : (
                 <div>
@@ -92,6 +101,8 @@ export default function Home() {
                     }
                 </div>
             )}
+            <br></br>
+            <div>Last refresh: {isLoading ? "loading..." : lastRefresh}</div>
         </div>
     )
 }
