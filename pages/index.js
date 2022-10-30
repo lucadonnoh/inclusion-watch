@@ -2,6 +2,9 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState, useEffect, startTransition } from 'react'
+import Slider from '@mui/material/Slider';
+import { Typography, Container, Divider, Skeleton } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 
 export default function Home() {
     const [data, setData] = useState(null);
@@ -9,7 +12,6 @@ export default function Home() {
     const [inclusionRate, setInclusionRate] = useState([]);
     const [waitingPeriod, setWaitingPeriod] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [refreshToken, setRefreshToken] = useState(0);
     const [lastRefresh, setLastRefresh] = useState(new Date().toLocaleString());
 
 
@@ -28,27 +30,30 @@ export default function Home() {
         // 1 day period in seconds
         const end_time = new Date().getTime() / 1000;
         const start_time = end_time - 24 * 60 * 60;
-        fetch('/api/mevwatch', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 'startTime': start_time, 'endTime': end_time }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data);
-                setIsLoading(false);
-            }
-            )
-            .finally(() => {
-                setTimeout(() => {
-                    setLastRefresh(new Date().toLocaleString());
-                    setRefreshToken(Math.random());
-                }, 30 * 1000);
-            }
-            );
-    }, [refreshToken]);
+
+        const fetchData = async () => {
+            setIsLoading(true);
+            const response = await fetch('/api/mevwatch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'startTime': start_time, 'endTime': end_time }),
+            })
+            const data = await response.json();
+            setData(data);
+            setIsLoading(false);
+        }
+
+        fetchData();
+
+        const t = setInterval(() => {
+            fetchData();
+            setLastRefresh(new Date().toLocaleString());
+        }, 30 * 1000);
+
+        return () => clearInterval(t);
+    }, []);
 
     useEffect(() => {
         if (data) {
@@ -61,7 +66,7 @@ export default function Home() {
 
     useEffect(() => {
         const block_intervals = [1, 5, 10, 25];
-        const inclusion_rates = [0.5, 0.75, 0.9999];
+        const inclusion_rates = [0.25, 0.5, 0.75, 0.9999];
 
         var inclusionRates = [];
         for(var interval of block_intervals) {
@@ -79,30 +84,60 @@ export default function Home() {
     }, [ofacRate]);
 
     return (
-        <div className={styles.container} style={{marginTop: '2em'}}>
+        <Container className={styles.container} style={{marginTop: '2em'}}>
             {!data ? (
                 <div>Loading...</div>
             ) : (
                 <div>
-                    <div>24h ofacRate: {ofacRate}</div>
+                    <Container maxWidth="lg">
+                        <Typography variant="h2" textAlign="center" fontWeight="700">INCLUSION RATE</Typography>
+                        <Typography variant="h1" textAlign="center" color="#ffb86c" fontWeight="700">{(100*ofacRate).toFixed(2)}%</Typography>
+                        <Typography variant="h6" textAlign="center">daily avg OFAC compliant nodes</Typography>
+                    </Container>
                     <br></br>
-                    <div>tx inclusion rate per # of blocks</div>
-                    {
-                        inclusionRate.map((rate, index) => {
-                            return <div key={index}>{rate.blocks} .. {rate.rate}</div>
-                        })
-                    }
+                    <Divider sx={{
+                        "&::before, &::after": {
+                        borderColor: "#6272a4",
+                        },
+                        mt: "2em"
+                    }}>what is the probability that my tx will be included after N blocks?</Divider>
                     <br></br>
-                    <div>waiting period for tx inclusion rate</div>
-                    {
-                        waitingPeriod.map((period, index) => {
-                            return <div key={index}>{period.rate} .. {period.blocks} blocks .. {period.blocks*12}s</div>
-                        })
-                    }
+                    <Typography textAlign="center"></Typography>
+                    <Grid container spacing={12}>
+                        {
+                            inclusionRate.map((rate, index) => {
+                                return <Grid xs key={index}>
+                                            <Typography textAlign="center">{rate.blocks} BLOCKS</Typography>
+                                            <Typography variant="h5" textAlign="center" fontWeight="500">{(100*rate.rate).toFixed(2)}%</Typography>
+                                            <Typography textAlign="center">{rate.blocks*12 <= 36 ? '🚀' : rate.blocks*12 <= 90 ? '🚗' :  rate.blocks*12 <= 210 ? '🛵' : '🐌'} - {rate.blocks*12}s</Typography>
+                                        </Grid>
+                            })
+                        }
+                    </Grid>
+                    
+                    <br></br>
+                    <Divider sx={{
+                        "&::before, &::after": {
+                        borderColor: "#6272a4",
+                        },
+                        mt: "2em"
+                    }}>how much do i have to wait to have a P% of probability to include my OFAC violating tx?</Divider>
+                    <br></br>
+                    <Grid container spacing={12}>
+                        {
+                            waitingPeriod.map((period, index) => {
+                                return <Grid xs key={index}>
+                                        <Typography textAlign="center">{(100*period.rate).toFixed(2)}%</Typography>
+                                        <Typography variant="h5" textAlign="center" fontWeight="500">{period.blocks} BLOCKS</Typography>
+                                        <Typography textAlign="center">{period.blocks*12 <= 36 ? '🚀' : period.blocks*12 <= 90 ? '🚗' :  period.blocks*12 <= 210 ? '🛵' : '🐌'} - {period.blocks*12}s</Typography>
+                                    </Grid>
+                            })
+                        }
+                    </Grid>
                 </div>
             )}
             <br></br>
-            <div>Last refresh: {isLoading ? "loading..." : lastRefresh}</div>
-        </div>
+            <Container sx={{ mt: '2em' }}><Typography textAlign="center">Last update: {isLoading ? "loading..." : lastRefresh}</Typography></Container>
+        </Container>
     )
 }
