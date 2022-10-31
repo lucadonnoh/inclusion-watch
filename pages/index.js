@@ -3,7 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState, useEffect, startTransition } from 'react'
 import Slider from '@mui/material/Slider';
-import { Typography, Container, Divider, Skeleton } from '@mui/material';
+import { Typography, Container, Divider, Skeleton, Link, Button } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { makeStyles } from '@mui/styles';
 import humanizeDuration from 'humanize-duration';
@@ -11,6 +11,14 @@ import humanizeDuration from 'humanize-duration';
 const useStyle = makeStyles({
     mark: {
         color: "white"
+    },
+    button: {
+        color: "#6272a4",
+        borderColor: "#6272a4",
+        '&:hover': {
+            color: "#8be9fd",
+            borderColor: "#8be9fd",
+        },
     }
 });
 
@@ -22,11 +30,17 @@ export default function Home() {
     const [isLoading, setIsLoading] = useState(true);
     const [lastRefresh, setLastRefresh] = useState(new Date().toLocaleString());
     const [sliderValue, setSliderValue] = useState(0);
+    const [isSliderCustom, setIsSliderCustom] = useState(false);
 
     const handleSliderChange = (event, newValue) => {
+        setIsSliderCustom(true);
         setSliderValue(newValue);
-        // setOfacRate(newValue / 100)
     };
+
+    const handleSliderReset = () => {
+        setIsSliderCustom(false);
+        setSliderValue(ofacRate * 100);
+    }
 
     const classes = useStyle();
 
@@ -55,8 +69,13 @@ export default function Home() {
                 },
                 body: JSON.stringify({ 'startTime': start_time, 'endTime': end_time }),
             })
-            const data = await response.json();
-            setData(data);
+            await response.json()
+            .then(data => {
+                setData(data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
             setIsLoading(false);
         }
 
@@ -74,30 +93,40 @@ export default function Home() {
     useEffect(() => {
         if (data) {
             startTransition(() => {
-                setOfacRate(calculateOfacCompliantRate(data));
+                if(!isSliderCustom) {
+                    setOfacRate(calculateOfacCompliantRate(data));
+                    setSliderValue(calculateOfacCompliantRate(data) * 100);
+                }
             }
             );
         }
-    }, [data]);
+    }, [data, isSliderCustom]);
 
     useEffect(() => {
         const block_intervals = [1, 5, 10, 25];
         const inclusion_rates = [0.25, 0.5, 0.75, 0.9999];
 
+        var rate;
+        if(!isSliderCustom) {
+            rate = ofacRate;
+        } else {
+            rate = sliderValue / 100;
+        }
+
         var inclusionRates = [];
         for(var interval of block_intervals) {
-            var tx_inclusion_rate = 1-(ofacRate**interval);
+            var tx_inclusion_rate = 1-(rate**interval);
             inclusionRates.push({blocks: interval, rate: tx_inclusion_rate});
         }
         setInclusionRate(inclusionRates);
 
         var waitingPeriods = [];
-        for(var rate of inclusion_rates) {
-            var waiting_period = Math.ceil(Math.log(1-rate)/Math.log(ofacRate));
-            waitingPeriods.push({rate: rate, blocks: waiting_period});
+        for(var myRate of inclusion_rates) {
+            var waiting_period = Math.ceil(Math.log(1-myRate)/Math.log(rate));
+            waitingPeriods.push({rate: myRate, blocks: waiting_period});
         }
         setWaitingPeriod(waitingPeriods);
-    }, [ofacRate]);
+    }, [ofacRate, isSliderCustom, sliderValue]);
 
     return (
         <Container className={styles.container} style={{marginTop: '2em'}}>
@@ -106,21 +135,35 @@ export default function Home() {
             ) : (
                 <div>
                     <Container maxWidth="lg">
-                        <Typography variant="h2" textAlign="center" fontWeight="700">INCLUSION RATE</Typography>
+                        <Typography variant="h3" textAlign="center" fontWeight="700">INCLUSION WATCH</Typography>
                         {/* animated keyframes gradient text */}
-                        <Typography variant="h1" textAlign="center" className="linear-wipe" fontWeight="700">{(100*ofacRate).toFixed(2)}%</Typography>
+                        <Typography variant="h1" textAlign="center" className="linear-wipe" fontWeight="700">{!isSliderCustom ? (100*ofacRate).toFixed(2) : sliderValue.toFixed(2)}%</Typography>
                         <Typography variant="h6" textAlign="center">daily avg OFAC compliant nodes</Typography>
                     </Container>
                     <br></br>
+                    <Container align="right" className="resetContainer">
+                        {
+                            isSliderCustom ? <Button className={classes.button} variant="outlined" size="small" onClick={handleSliderReset}>Reset</Button> : <></>
+                        }
+                    </Container>
                     {
                         ofacRate ? <Slider
                             aria-label="Temperature"
-                            defaultValue={ofacRate * 100}
+                            defaultValue={53}
                             valueLabelDisplay="auto"
-                            marks
+                            marks={[
+                                { value: 0, label: '0%'},
+                                { value: 25, label: '25%'},
+                                { value: (ofacRate * 100), label: 'now'},
+                                { value: 50, label: '50%'},
+                                { value: 75, label: '75%'},
+                                { value: 100, label: '100%'}]}
                             min={0}
                             max={100}
-                            color="secondary"
+                            sx={{
+                                color: '#bd93f9'
+                            }}
+                            step={0.01}
                             classes={{ markLabel: classes.mark }}
                             value={sliderValue}
                             onChange={handleSliderChange}
@@ -132,7 +175,7 @@ export default function Home() {
                         borderColor: "#6272a4",
                         },
                         mt: "2em"
-                    }}>what is the probability that my tx will be included after N blocks?</Divider>
+                    }}>what is the probability that my OFAC violating tx will be included after N blocks?</Divider>
                     <br></br>
                     <Typography textAlign="center"></Typography>
                     <Grid container spacing={12}>
@@ -169,7 +212,10 @@ export default function Home() {
                 </div>
             )}
             <br></br>
-            <Container sx={{ mt: '2em' }}><Typography textAlign="center">Last update: {isLoading ? "loading..." : lastRefresh}</Typography></Container>
+            <Container sx={{ mt: '1em' }}>
+                <Typography textAlign="center" color="#6272a4">Last update: {isLoading ? "loading..." : lastRefresh}</Typography>
+                <Typography textAlign="center" mt="1em">Built by <Link href="" color="#ff79c6">donnoh.eth</Link> & <Link href="" color="#ff79c6">emiliano.eth</Link> - data provided by <Link href="" color="#ff79c6">mevwatch.info</Link></Typography>
+            </Container>
         </Container>
     )
 }
