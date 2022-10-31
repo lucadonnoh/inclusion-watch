@@ -5,6 +5,14 @@ import { useState, useEffect, startTransition } from 'react'
 import Slider from '@mui/material/Slider';
 import { Typography, Container, Divider, Skeleton } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import { makeStyles } from '@mui/styles';
+import humanizeDuration from 'humanize-duration';
+
+const useStyle = makeStyles({
+    mark: {
+        color: "white"
+    }
+});
 
 export default function Home() {
     const [data, setData] = useState(null);
@@ -13,7 +21,14 @@ export default function Home() {
     const [waitingPeriod, setWaitingPeriod] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [lastRefresh, setLastRefresh] = useState(new Date().toLocaleString());
+    const [sliderValue, setSliderValue] = useState(0);
 
+    const handleSliderChange = (event, newValue) => {
+        setSliderValue(newValue);
+        // setOfacRate(newValue / 100)
+    };
+
+    const classes = useStyle();
 
     const calculateOfacCompliantRate = (data) => {
         var censoredBlocks = 0;
@@ -55,6 +70,7 @@ export default function Home() {
         return () => clearInterval(t);
     }, []);
 
+
     useEffect(() => {
         if (data) {
             startTransition(() => {
@@ -91,9 +107,25 @@ export default function Home() {
                 <div>
                     <Container maxWidth="lg">
                         <Typography variant="h2" textAlign="center" fontWeight="700">INCLUSION RATE</Typography>
-                        <Typography variant="h1" textAlign="center" color="#ffb86c" fontWeight="700">{(100*ofacRate).toFixed(2)}%</Typography>
+                        {/* animated keyframes gradient text */}
+                        <Typography variant="h1" textAlign="center" className="linear-wipe" fontWeight="700">{(100*ofacRate).toFixed(2)}%</Typography>
                         <Typography variant="h6" textAlign="center">daily avg OFAC compliant nodes</Typography>
                     </Container>
+                    <br></br>
+                    {
+                        ofacRate ? <Slider
+                            aria-label="Temperature"
+                            defaultValue={ofacRate * 100}
+                            valueLabelDisplay="auto"
+                            marks
+                            min={0}
+                            max={100}
+                            color="secondary"
+                            classes={{ markLabel: classes.mark }}
+                            value={sliderValue}
+                            onChange={handleSliderChange}
+                        /> : <></>
+                    }
                     <br></br>
                     <Divider sx={{
                         "&::before, &::after": {
@@ -107,9 +139,9 @@ export default function Home() {
                         {
                             inclusionRate.map((rate, index) => {
                                 return <Grid xs key={index}>
-                                            <Typography textAlign="center">{rate.blocks} BLOCKS</Typography>
+                                            <Typography textAlign="center">{rate.blocks} {rate.blocks > 1 ? 'BLOCKS' : 'BLOCK'} </Typography>
                                             <Typography variant="h5" textAlign="center" fontWeight="500">{(100*rate.rate).toFixed(2)}%</Typography>
-                                            <Typography textAlign="center">{rate.blocks*12 <= 36 ? '🚀' : rate.blocks*12 <= 90 ? '🚗' :  rate.blocks*12 <= 210 ? '🛵' : '🐌'} - {rate.blocks*12}s</Typography>
+                                            <Typography textAlign="center">{rate.blocks*12 <= 36 ? '🚀' : rate.blocks*12 <= 90 ? '🚗' :  rate.blocks*12 <= 210 ? '🛵' : '🐌'} — {humanizeDuration(rate.blocks*12*1000)}</Typography>
                                         </Grid>
                             })
                         }
@@ -128,8 +160,8 @@ export default function Home() {
                             waitingPeriod.map((period, index) => {
                                 return <Grid xs key={index}>
                                         <Typography textAlign="center">{(100*period.rate).toFixed(2)}%</Typography>
-                                        <Typography variant="h5" textAlign="center" fontWeight="500">{period.blocks} BLOCKS</Typography>
-                                        <Typography textAlign="center">{period.blocks*12 <= 36 ? '🚀' : period.blocks*12 <= 90 ? '🚗' :  period.blocks*12 <= 210 ? '🛵' : '🐌'} - {period.blocks*12}s</Typography>
+                                        <Typography variant="h5" textAlign="center" fontWeight="500">{period.blocks} {period.blocks > 1 ? 'BLOCKS' : 'BLOCK'}</Typography>
+                                        <Typography textAlign="center">{period.blocks*12 <= 36 ? '🚀' : period.blocks*12 <= 90 ? '🚗' :  period.blocks*12 <= 210 ? '🛵' : '🐌'} — {humanizeDuration(period.blocks*12*1000)}</Typography>
                                     </Grid>
                             })
                         }
