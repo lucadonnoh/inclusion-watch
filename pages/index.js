@@ -164,7 +164,7 @@ export default function Home() {
                         <Typography variant="h3" textAlign="center" fontWeight="700">🦹🏼️ INCLUSION WATCH 🔎</Typography>
                         {/* animated keyframes gradient text */}
                         <Grid container direction="row" spacing={0} alignItems="top" justifyContent="center">
-                            <Typography variant="h1" textAlign="center" className="linear-wipe" fontWeight="700">
+                            <Typography variant="h1" fontSize="5em" textAlign="center" className="linear-wipe" fontWeight="700">
                                 {
                                     !isSliderCustom 
                                         ? (100*ofacRate).toFixed(2) 
@@ -191,6 +191,7 @@ export default function Home() {
                             isSliderCustom ? <Button className={classes.button} variant="outlined" size="small" onClick={handleSliderReset}>Reset</Button> : <></>
                         }
                     </Container>
+                    <br></br>
                     {
                         ofacRate 
                         ? <Slider
