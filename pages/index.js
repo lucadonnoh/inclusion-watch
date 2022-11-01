@@ -113,7 +113,7 @@ export default function Home() {
 
 
     useEffect(() => {
-        if (data) {
+        if (data && prevData) {
             startTransition(() => {
                 if(!isSliderCustom) {
                     setOfacRate(calculateOfacCompliantRate(data));
@@ -158,7 +158,7 @@ export default function Home() {
             ) : (
                 <div>
                     <Container maxWidth="lg">
-                        <Typography variant="h3" textAlign="center" fontWeight="700">INCLUSION WATCH</Typography>
+                        <Typography variant="h3" textAlign="center" fontWeight="700">🦹🏼️ INCLUSION WATCH 🔎</Typography>
                         {/* animated keyframes gradient text */}
                         <Grid container direction="row" spacing={0} alignItems="top" justifyContent="center">
                             <Typography variant="h1" textAlign="center" className="linear-wipe" fontWeight="700">
@@ -217,13 +217,13 @@ export default function Home() {
                         borderColor: "#6272a4",
                         },
                         mt: "2em"
-                    }}>what is the probability that my OFAC violating tx will be included after N blocks?</Divider>
+                    }}>inclusion probability per N blocks</Divider>
                     <br></br>
                     <Typography textAlign="center"></Typography>
-                    <Grid container spacing={12}>
+                    <Grid container spacing={2}>
                         {
                             inclusionRate.map((rate, index) => {
-                                return <Grid xs key={index}>
+                                return <Grid xs={6} md={3} key={index}>
                                             <Typography textAlign="center">{rate.blocks} {rate.blocks > 1 ? 'BLOCKS' : 'BLOCK'} </Typography>
                                             <Typography variant="h5" textAlign="center" fontWeight="500">{(100*rate.rate).toFixed(2)}%</Typography>
                                             <Typography textAlign="center">{rate.blocks*12 <= 36 ? '🚀' : rate.blocks*12 <= 90 ? '🚗' :  rate.blocks*12 <= 210 ? '🛵' : '🐌'} — {humanizeDuration(rate.blocks*12*1000)}</Typography>
@@ -238,12 +238,12 @@ export default function Home() {
                         borderColor: "#6272a4",
                         },
                         mt: "2em"
-                    }}>how much do i have to wait to have a P% of probability to include my OFAC violating tx?</Divider>
+                    }}>waiting time per inclusion probability</Divider>
                     <br></br>
-                    <Grid container spacing={12}>
+                    <Grid container spacing={2}>
                         {
                             waitingPeriod.map((period, index) => {
-                                return <Grid xs key={index}>
+                                return <Grid xs={6} md={3} key={index}>
                                         <Typography textAlign="center">{(100*period.rate).toFixed(2)}%</Typography>
                                         <Typography variant="h5" textAlign="center" fontWeight="500">{period.blocks} {period.blocks > 1 ? 'BLOCKS' : 'BLOCK'}</Typography>
                                         <Typography textAlign="center">{period.blocks*12 <= 36 ? '🚀' : period.blocks*12 <= 90 ? '🚗' :  period.blocks*12 <= 210 ? '🛵' : '🐌'} — {humanizeDuration(period.blocks*12*1000)}</Typography>
