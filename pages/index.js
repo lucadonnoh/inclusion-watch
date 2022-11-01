@@ -216,7 +216,6 @@ export default function Home() {
                         : <></>
                     }
                     </Container>
-                    <br></br>
                     <Divider sx={{
                         "&::before, &::after": {
                         borderColor: "#6272a4",
