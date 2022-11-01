@@ -7,11 +7,12 @@ import { Typography, Container, Divider, Skeleton, Link, Button, Stack } from '@
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { makeStyles } from '@mui/styles';
 import humanizeDuration from 'humanize-duration';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const useStyle = makeStyles({
+    // white for dark mode and black for light mode
     mark: {
-        color: "white"
+        color: 'white'
     },
     button: {
         color: "#6272a4",
@@ -34,6 +35,8 @@ export default function Home() {
     const [isSliderCustom, setIsSliderCustom] = useState(false);
     const [prevData, setPrevData] = useState(null);
     const [dailyChange, setDailyChange] = useState(null);
+
+    const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
     const handleSliderChange = (event, newValue) => {
         setIsSliderCustom(true);
@@ -189,7 +192,8 @@ export default function Home() {
                         }
                     </Container>
                     {
-                        ofacRate ? <Slider
+                        ofacRate 
+                        ? <Slider
                             aria-label="Temperature"
                             defaultValue={53}
                             valueLabelDisplay="auto"
@@ -209,7 +213,8 @@ export default function Home() {
                             classes={{ markLabel: classes.mark }}
                             value={sliderValue}
                             onChange={handleSliderChange}
-                        /> : <></>
+                        /> 
+                        : <></>
                     }
                     <br></br>
                     <Divider sx={{

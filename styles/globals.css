@@ -15,15 +15,25 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+html {
+  color-scheme: dark;
+}
+body {
+  color: white;
+  background: #282a36;
+}
+
+/*
+@media (prefers-color-scheme: light) {
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
-    color: white;
-    background: #282a36;
+    color: #282a36;
+    background: #f8f8f2;
   }
 }
+*/
 
 .gradient {
   background: linear-gradient(to right, #ffb86c 0%, #ff0000 33%, #ffb86c 66%, #ff0000 100%);
