@@ -186,12 +186,10 @@ export default function Home() {
                         <Typography variant="h6" textAlign="center">daily avg OFAC compliant nodes</Typography>
                     </Container>
                     <br></br>
-                    <Container align="right" className="resetContainer">
-                        {
-                            isSliderCustom ? <Button className={classes.button} variant="outlined" size="small" onClick={handleSliderReset}>Reset</Button> : <></>
-                        }
-                    </Container>
-                    <br></br>
+                    <Container>
+                        <Container align="right">
+                            <Button className={classes.button} sx={{ visibility: isSliderCustom ? 'visible' : 'hidden'}} variant="outlined" size="small" onClick={handleSliderReset}>Reset</Button>
+                        </Container>
                     {
                         ofacRate 
                         ? <Slider
@@ -217,6 +215,7 @@ export default function Home() {
                         /> 
                         : <></>
                     }
+                    </Container>
                     <br></br>
                     <Divider sx={{
                         "&::before, &::after": {
