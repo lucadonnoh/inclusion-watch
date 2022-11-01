@@ -222,7 +222,7 @@ export default function Home() {
                         borderColor: "#6272a4",
                         },
                         mt: "2em"
-                    }}>inclusion probability per N blocks</Divider>
+                    }}>inclusion probability per # of blocks</Divider>
                     <br></br>
                     <Typography textAlign="center"></Typography>
                     <Grid container spacing={2}>
