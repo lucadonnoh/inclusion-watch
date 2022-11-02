@@ -75,6 +75,7 @@ export default function Home() {
             await response.json()
             .then(data => {
                 setData(data);
+                setLastRefresh(new Date().toLocaleString());
                 setFetchError(null);
             })
             .catch(error => {
@@ -107,18 +108,18 @@ export default function Home() {
         const t = setInterval(() => {
             fetchData();
             fetchDataPrevDay();
-            setLastRefresh(new Date().toLocaleString());
         }, 30 * 1000);
 
         return () => clearInterval(t);
     }, []);
 
     useEffect(() => {
-        if(fetchError && !ofacRate) {
+        if(fetchError && !sliderValue) {
             setLastRefresh("error fetching data, retrying...");
-            setOfacRate(0.50);
+            setSliderValue(50.00);
+            setIsSliderCustom(true);
         }
-    }, [fetchError, ofacRate]);
+    }, [fetchError, sliderValue]);
 
     useEffect(() => {
         if (data && prevData) {
@@ -165,7 +166,7 @@ export default function Home() {
                 <title>inclusion.watch</title>
                 <meta name="description" content="inclusion.watch" />
             </Head>
-            {!data ? (
+            {!ofacRate && !sliderValue ? (
                 <div>Loading...</div>
             ) : (
                 <div>
@@ -200,7 +201,7 @@ export default function Home() {
                             <Button className={classes.button} sx={{ visibility: isSliderCustom ? 'visible' : 'hidden'}} variant="outlined" size="small" onClick={handleSliderReset}>Reset</Button>
                         </Container>
                     {
-                        ofacRate 
+                        (ofacRate || sliderValue)
                         ? <Slider
                             aria-label="Temperature"
                             defaultValue={53}
