@@ -183,7 +183,7 @@ export default function Home() {
                             }
                             
                         </Grid>
-                        <Typography variant="h6" textAlign="center">daily avg OFAC compliant nodes</Typography>
+                        <Typography variant="h6" textAlign="center">daily avg OFAC compliant blocks</Typography>
                     </Container>
                     <br></br>
                     <Container>
