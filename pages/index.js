@@ -1,17 +1,14 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState, useEffect, startTransition } from 'react'
-import Slider from '@mui/material/Slider';
-import { Typography, Container, Divider, Skeleton, Link, Button, Stack } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import { makeStyles } from '@mui/styles';
-import humanizeDuration from 'humanize-duration';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import Slider from '@mui/material/Slider'
+import { Typography, Container, Divider, Link, Button } from '@mui/material'
+import Grid from '@mui/material/Unstable_Grid2'
+import { makeStyles } from '@mui/styles'
+import humanizeDuration from 'humanize-duration'
+import GitHubIcon from '@mui/icons-material/GitHub'
 
 const useStyle = makeStyles({
-    // white for dark mode and black for light mode
     mark: {
         color: 'white'
     },
@@ -36,8 +33,7 @@ export default function Home() {
     const [isSliderCustom, setIsSliderCustom] = useState(false);
     const [prevData, setPrevData] = useState(null);
     const [dailyChange, setDailyChange] = useState(null);
-
-    const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+    const [fetchError, setFetchError] = useState(null);
 
     const handleSliderChange = (event, newValue) => {
         setIsSliderCustom(true);
@@ -79,9 +75,11 @@ export default function Home() {
             await response.json()
             .then(data => {
                 setData(data);
+                setFetchError(null);
             })
             .catch(error => {
                 console.log(error);
+                setFetchError(error);
             });
             setIsLoading(false);
         }
@@ -115,6 +113,12 @@ export default function Home() {
         return () => clearInterval(t);
     }, []);
 
+    useEffect(() => {
+        if(fetchError && !ofacRate) {
+            setLastRefresh("error fetching data, retrying...");
+            setOfacRate(0.50);
+        }
+    }, [fetchError, ofacRate]);
 
     useEffect(() => {
         if (data && prevData) {
@@ -157,6 +161,10 @@ export default function Home() {
 
     return (
         <Container className={styles.container} style={{marginTop: '2em'}}>
+            <Head>
+                <title>inclusion.watch</title>
+                <meta name="description" content="inclusion.watch" />
+            </Head>
             {!data ? (
                 <div>Loading...</div>
             ) : (
