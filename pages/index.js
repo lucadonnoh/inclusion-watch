@@ -261,6 +261,7 @@ export default function Home() {
             <Container sx={{ mt: '1em' }}>
                 <Typography textAlign="center" color="#6272a4">Last update: {isLoading ? "loading..." : lastRefresh}</Typography>
                 <Typography textAlign="center" mt="1em">Built by <Link href="https://twitter.com/donnoh_eth" color="#ff79c6" target="_blank" rel="noreferrer">donnoh.eth</Link> & <Link href="https://twitter.com/emilianobonassi" color="#ff79c6" target="_blank" rel="noreferrer">emiliano.eth</Link> - data provided by <Link href="https://mevwatch.info" color="#ff79c6" target="_blank" rel="noreferrer">mevwatch.info</Link></Typography>
+                <Typography textAlign="center" mt="1em"><Link href="https://github.com/lucadonnoh/inclusion-watch" color="#ff79c6" target="_blank" rel="noreferrer">GitHub</Link></Typography>
             </Container>
         </Container>
     )
