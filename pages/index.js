@@ -6,7 +6,8 @@ import { Typography, Container, Divider, Link, Button } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import { makeStyles } from '@mui/styles'
 import humanizeDuration from 'humanize-duration'
-import GitHubIcon from '@mui/icons-material/GitHub'
+
+import Footer from '../components/Footer'
 
 const useStyle = makeStyles({
     mark: {
@@ -268,11 +269,8 @@ export default function Home() {
                 </div>
             )}
             <br></br>
-            <Container sx={{ mt: '1em' }}>
-                <Typography textAlign="center" color="#6272a4">Last update: {isLoading ? "loading..." : lastRefresh}</Typography>
-                <Typography textAlign="center" mt="1em">Built by <Link href="https://twitter.com/donnoh_eth" color="#ff79c6" target="_blank" rel="noreferrer">donnoh.eth</Link> & <Link href="https://twitter.com/emilianobonassi" color="#ff79c6" target="_blank" rel="noreferrer">emiliano.eth</Link> - data provided by <Link href="https://mevwatch.info" color="#ff79c6" target="_blank" rel="noreferrer">mevwatch.info</Link></Typography>
-                <Typography textAlign="center" mt="1em"><Link href="https://github.com/lucadonnoh/inclusion-watch" color="#ff79c6" target="_blank" rel="noreferrer"><GitHubIcon/></Link></Typography>
-            </Container>
+            <Typography textAlign="center" color="#6272a4">Last update: {isLoading ? "loading..." : lastRefresh}</Typography>
+            <Footer isLoading={isLoading} lastRefresh={lastRefresh}/>
         </Container>
     )
 }
