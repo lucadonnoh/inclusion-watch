@@ -172,7 +172,7 @@ export default function Home() {
             ) : (
                 <div>
                     <Container maxWidth="lg">
-                        <Typography variant="h3" textAlign="center" fontWeight="700">🦹🏼️ INCLUSION WATCH 🔎</Typography>
+                        <Typography variant="h3" textAlign="center" fontWeight="700">🦹🏼️ INCLUSION<span style={{fontSize: "0em"}}> </span>.WATCH 🔎</Typography>
                         {/* animated keyframes gradient text */}
                         <Grid container direction="row" spacing={0} alignItems="top" justifyContent="center">
                             <Typography variant="h1" fontSize="5em" textAlign="center" className="linear-wipe" fontWeight="700">
