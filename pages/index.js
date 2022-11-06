@@ -35,6 +35,9 @@ export default function Home() {
     const [prevData, setPrevData] = useState(null);
     const [dailyChange, setDailyChange] = useState(null);
     const [fetchError, setFetchError] = useState(null);
+    const [OPtvl, setOPtvl] = useState(null);
+    const [ARBtvl, setARBtvl] = useState(null);
+    const [tvls, setTvls] = useState(null);
 
     const handleSliderChange = (event, newValue) => {
         setIsSliderCustom(true);
@@ -111,8 +114,50 @@ export default function Home() {
             fetchDataPrevDay();
         }, 30 * 1000);
 
+        const fetchOPtvl = async () => {
+            const response = await fetch('/api/OPtvl');
+            await response.json()
+            .then(data => {
+                const tvl = data.daily.data[data.daily.data.length - 1]
+                const formattedTvl = {
+                    date: new Date(tvl[0]*1000).toLocaleString(),
+                    usd: tvl[1],
+                    eth: tvl[2]
+                }
+                setOPtvl(formattedTvl);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+
+        fetchOPtvl();
+
+        const fetchARBtvl = async () => {
+            const response = await fetch('/api/ARBtvl');
+            await response.json()
+            .then(data => {
+                const tvl = data.daily.data[data.daily.data.length - 1]
+                const formattedTvl = {
+                    date: new Date(tvl[0]*1000).toLocaleString(),
+                    usd: tvl[1],
+                    eth: tvl[2]
+                }
+                setARBtvl(formattedTvl);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+
+        fetchARBtvl();
+
         return () => clearInterval(t);
     }, []);
+
+    useEffect(() => {
+        setTvls([OPtvl, ARBtvl]);
+    }, [OPtvl, ARBtvl]);
 
     useEffect(() => {
         if(fetchError && !sliderValue) {
@@ -234,7 +279,6 @@ export default function Home() {
                         mt: "2em"
                     }}>inclusion probability per # of blocks</Divider>
                     <br></br>
-                    <Typography textAlign="center"></Typography>
                     <Grid container spacing={2}>
                         {
                             inclusionRate.map((rate, index) => {
@@ -259,10 +303,10 @@ export default function Home() {
                         {
                             waitingPeriod.map((period, index) => {
                                 return <Grid xs={6} md={3} key={index}>
-                                        <Typography textAlign="center">{(100*period.rate).toFixed(2)}%</Typography>
-                                        <Typography variant="h5" textAlign="center" fontWeight="500">{period.blocks} {period.blocks > 1 ? 'BLOCKS' : 'BLOCK'}</Typography>
-                                        <Typography textAlign="center">{period.blocks*12 <= 36 ? '🚀' : period.blocks*12 <= 90 ? '🚗' :  period.blocks*12 <= 210 ? '🛵' : '🐌'} — {humanizeDuration(period.blocks*12*1000)}</Typography>
-                                    </Grid>
+                                            <Typography textAlign="center">{(100*period.rate).toFixed(2)}%</Typography>
+                                            <Typography variant="h5" textAlign="center" fontWeight="500">{period.blocks} {period.blocks > 1 ? 'BLOCKS' : 'BLOCK'}</Typography>
+                                            <Typography textAlign="center">{period.blocks*12 <= 36 ? '🚀' : period.blocks*12 <= 90 ? '🚗' :  period.blocks*12 <= 210 ? '🛵' : '🐌'} — {humanizeDuration(period.blocks*12*1000)}</Typography>
+                                        </Grid>
                             })
                         }
                     </Grid>
@@ -270,6 +314,25 @@ export default function Home() {
             )}
             <br></br>
             <Typography textAlign="center" color="#6272a4">Last update: {isLoading ? "loading..." : lastRefresh}</Typography>
+            <Typography mt="0.3em" variant="h4" textAlign="center" fontWeight="700">WHAT IF THE NETWORK CENSORED FRAUD PROOFS?*</Typography>
+            <Typography variant="subtitle2" textAlign="center" color="#6272a4">*yes it is a very different scenario and the percentage would be different, it is just illustrative</Typography>
+            <Divider sx={{
+                        "&::before, &::after": {
+                        borderColor: "#6272a4",
+                        },
+                        mt: "2em"
+                    }}>total value locked</Divider>
+            <Grid container spacing={2}>
+                {
+                    tvls ? tvls.map((tvl, index) => {
+                        return tvl ? <Grid xs={6} key={index}>
+                                    <Typography textAlign="center">xxx</Typography>
+                                    <Typography variant="h5" textAlign="center" fontWeight="500">Ξ{(tvl.eth/1e6).toFixed(4)}M</Typography>
+                                    <Typography textAlign="center">{tvl.date}</Typography>
+                                </Grid> : <></>
+                        }) : <></>
+                }
+            </Grid>
             <Footer isLoading={isLoading} lastRefresh={lastRefresh}/>
         </Container>
     )
