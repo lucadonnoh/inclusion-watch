@@ -112,7 +112,7 @@ export default function Home() {
         const t = setInterval(() => {
             fetchData();
             fetchDataPrevDay();
-        }, 30 * 1000);
+        }, 60 * 1000);
 
         const fetchOPtvl = async () => {
             const response = await fetch('/api/OPtvl');
