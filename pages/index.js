@@ -114,50 +114,8 @@ export default function Home() {
             fetchDataPrevDay();
         }, 60 * 1000);
 
-        const fetchOPtvl = async () => {
-            const response = await fetch('/api/OPtvl');
-            await response.json()
-            .then(data => {
-                const tvl = data.daily.data[data.daily.data.length - 1]
-                const formattedTvl = {
-                    date: new Date(tvl[0]*1000).toLocaleString(),
-                    usd: tvl[1],
-                    eth: tvl[2]
-                }
-                setOPtvl(formattedTvl);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        }
-
-        fetchOPtvl();
-
-        const fetchARBtvl = async () => {
-            const response = await fetch('/api/ARBtvl');
-            await response.json()
-            .then(data => {
-                const tvl = data.daily.data[data.daily.data.length - 1]
-                const formattedTvl = {
-                    date: new Date(tvl[0]*1000).toLocaleString(),
-                    usd: tvl[1],
-                    eth: tvl[2]
-                }
-                setARBtvl(formattedTvl);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        }
-
-        fetchARBtvl();
-
         return () => clearInterval(t);
     }, []);
-
-    useEffect(() => {
-        setTvls([OPtvl, ARBtvl]);
-    }, [OPtvl, ARBtvl]);
 
     useEffect(() => {
         if(fetchError && !sliderValue) {
