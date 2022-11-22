@@ -314,25 +314,6 @@ export default function Home() {
             )}
             <br></br>
             <Typography textAlign="center" color="#6272a4">Last update: {isLoading ? "loading..." : lastRefresh}</Typography>
-            <Typography mt="0.3em" variant="h4" textAlign="center" fontWeight="700">WHAT IF THE NETWORK CENSORED FRAUD PROOFS?*</Typography>
-            <Typography variant="subtitle2" textAlign="center" color="#6272a4">*yes it is a very different scenario and the percentage would be different, it is just illustrative</Typography>
-            <Divider sx={{
-                        "&::before, &::after": {
-                        borderColor: "#6272a4",
-                        },
-                        mt: "2em"
-                    }}>total value locked</Divider>
-            <Grid container spacing={2}>
-                {
-                    tvls ? tvls.map((tvl, index) => {
-                        return tvl ? <Grid xs={6} key={index}>
-                                    <Typography textAlign="center">xxx</Typography>
-                                    <Typography variant="h5" textAlign="center" fontWeight="500">Ξ{(tvl.eth/1e6).toFixed(4)}M</Typography>
-                                    <Typography textAlign="center">{tvl.date}</Typography>
-                                </Grid> : <></>
-                        }) : <></>
-                }
-            </Grid>
             <Footer isLoading={isLoading} lastRefresh={lastRefresh}/>
         </Container>
     )
